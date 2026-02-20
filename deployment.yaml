@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yaki-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: yaki-app
+  template:
+    metadata:
+      labels:
+        app: yaki-app
+    spec:
+      containers:
+      - name: web
+        image: yaki-app:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yaki-service
+spec:
+  selector:
+    app: yaki-app
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
