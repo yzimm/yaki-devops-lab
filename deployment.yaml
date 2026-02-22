@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: web
-        image: yaki-app:v1
-        imagePullPolicy: IfNotPresent
+        image: yzimm/yaki-app:v1 # <--- ודא שדחפת את האימג' הזה ל-Docker Hub
+        imagePullPolicy: Always # נשנה ל-Always כדי שימשוך מהענן
         ports:
         - containerPort: 80
 ---
@@ -29,4 +29,5 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-  type: ClusterIP
+    nodePort: 30500 # תוכל לגשת בכתובת http://10.226.188.153:30500
+  type: NodePort
