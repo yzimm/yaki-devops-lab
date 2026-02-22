@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: yzimm/yaki-app:v1 # <--- ודא שדחפת את האימג' הזה ל-Docker Hub
+        image: yaki2026/yaki-app:v1 # <--- ודא שדחפת את האימג' הזה ל-Docker Hub
         imagePullPolicy: Always # נשנה ל-Always כדי שימשוך מהענן
         ports:
         - containerPort: 80
