@@ -1,0 +1,11 @@
+variables.tf.example
+# This is a template file. 
+# Copy this to a file named 'terraform.tfvars' and fill in your real values.
+
+host_ip               = "10.53.118.15"
+github_token          = "ghp_insert_your_personal_access_token_here"
+argocd_admin_password = "choose_a_strong_admin_password"
+
+# Optional:
+ssh_password          = "your_ssh_password"
+k8s_token             = "your_k8s_token_if_applicable"
