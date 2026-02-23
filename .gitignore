@@ -1,0 +1,7 @@
+# This hides your passwords from GitHub
+terraform.tfvars
+
+# This hides the temporary state files that might contain passwords
+*.tfstate
+*.tfstate.backup
+.terraform/
