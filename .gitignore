@@ -1,0 +1,3 @@
+echo * > .gitignore
+echo !index.html >> .gitignore
+echo !.gitignore >> .gitignore
