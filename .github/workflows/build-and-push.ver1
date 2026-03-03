@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       # -------------------------
-      # Install Kustomize (manual)
+      # Install Kustomize
       # -------------------------
       - name: Install kustomize
         run: |
@@ -46,7 +46,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # -------------------------
-      # Set Docker image tag based on branch + commit SHA
+      # Set image tag (branch + short SHA)
       # -------------------------
       - name: Set Docker image tag
         id: vars
@@ -74,19 +74,17 @@ jobs:
       # -------------------------
       - name: Update image in kustomization
         run: |
-          ENV_FOLDER="${{ steps.vars.outputs.TAG%%-* }}"
-          cd k8s/overlays/$ENV_FOLDER
+          cd k8s/overlays/${{ steps.vars.outputs.TAG%%-* }}  # use environment folder only
           kustomize edit set image my-web-app=yaki2026/my-web-app:${{ steps.vars.outputs.TAG }}
 
       # -------------------------
-      # Commit and push changes
+      # Commit and push kustomization
       # -------------------------
-      - name: Commit and push kustomization
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          ENV_FOLDER="${{ steps.vars.outputs.TAG%%-* }}"
-          git add k8s/overlays/$ENV_FOLDER/kustomization.yaml
+          git add k8s/overlays/${{ steps.vars.outputs.TAG%%-* }}/kustomization.yaml
           git diff --cached --quiet || git commit -m "Update image to ${{ steps.vars.outputs.TAG }}"
           git push --force
 
@@ -94,10 +92,9 @@ jobs:
       # Optional: Deploy to Kubernetes
       # -------------------------
       - name: Deploy to cluster
-        if: ${{ secrets.KUBECONFIG }}
+        if: ${{ github.ref_name != 'main' || github.event_name == 'workflow_dispatch' }}
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
         run: |
-          ENV_FOLDER="${{ steps.vars.outputs.TAG%%-* }}"
-          cd k8s/overlays/$ENV_FOLDER
+          cd k8s/overlays/${{ steps.vars.outputs.TAG%%-* }}
           kubectl apply -k .
