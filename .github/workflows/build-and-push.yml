@@ -7,36 +7,58 @@ on:
       - staging
       - dev
 
+permissions:
+  contents: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      # -------------------------
+      # Install Kustomize (Stable)
+      # -------------------------
       - name: Install kustomize
         run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          KUSTOMIZE_VERSION="5.4.1"
+          curl -L -o kustomize.tar.gz \
+            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
+          tar -xzf kustomize.tar.gz
+          chmod +x kustomize
           sudo mv kustomize /usr/local/bin/
+          kustomize version
 
+      # -------------------------
+      # Docker Login
+      # -------------------------
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # -------------------------
+      # Set Image Tag Based on Branch
+      # -------------------------
       - name: Set image tag based on branch
         id: vars
         run: |
-          if [ "${{ github.ref_name }}" == "main" ]; then
+          if [ "${{ github.ref_name }}" = "main" ]; then
             echo "TAG=prod" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref_name }}" == "staging" ]; then
+          elif [ "${{ github.ref_name }}" = "staging" ]; then
             echo "TAG=staging" >> $GITHUB_OUTPUT
           else
             echo "TAG=dev" >> $GITHUB_OUTPUT
           fi
 
+      # -------------------------
+      # Build and Push Docker Image
+      # -------------------------
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -44,11 +66,17 @@ jobs:
           push: true
           tags: yaki2026/my-web-app:${{ steps.vars.outputs.TAG }}
 
+      # -------------------------
+      # Update Kustomize Image
+      # -------------------------
       - name: Update image in kustomization
         run: |
           cd k8s/overlays/${{ steps.vars.outputs.TAG }}
           kustomize edit set image my-web-app=yaki2026/my-web-app:${{ steps.vars.outputs.TAG }}
 
+      # -------------------------
+      # Commit and Push Changes
+      # -------------------------
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
