@@ -1,3 +1,7 @@
+resources:
+  - ../../base
+  - service.yaml
+
 images:
   - name: my-web-app
     newName: yaki2026/my-web-app
