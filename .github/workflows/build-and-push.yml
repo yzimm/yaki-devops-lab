@@ -1,4 +1,3 @@
-
 name: CI - Build and Push
 
 on:
@@ -18,8 +17,8 @@ jobs:
 
       - name: Install kustomize
         run: |
-          sudo apt-get update
-          sudo apt-get install -y kustomize
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
