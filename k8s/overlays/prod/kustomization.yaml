@@ -1,4 +1,7 @@
 images:
+- name: my-web-app
+  newName: yaki2026/my-web-app
+  newTag: prod-86cf1ce
 - name: yaki2026/my-web-app
   newName: yaki2026/my-web-app
   newTag: prod-ec00688
