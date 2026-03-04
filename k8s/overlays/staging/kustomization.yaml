@@ -1,4 +1,6 @@
 images:
-  - name: my-web-app
-    newName: yaki2026/my-web-app
-    newTag: staging
+- name: my-web-app
+  newName: yaki2026/my-web-app
+  newTag: staging-68b3f2e
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
