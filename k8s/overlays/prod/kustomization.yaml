@@ -5,7 +5,7 @@ resources:
 images:
 - name: my-web-app
   newName: yaki2026/my-web-app
-  newTag: prod-f6633b4
+  newTag: prod-7861fb0
 - name: yaki2026/my-web-app
   newName: yaki2026/my-web-app
   newTag: prod-ec00688
