@@ -3,6 +3,9 @@ kind: Kustomization
 resources:
 - ../../base
 images:
+- name: my-web-app
+  newName: yaki2026/my-web-app
+  newTag: prod-f6633b4
 - name: yaki2026/my-web-app
   newName: yaki2026/my-web-app
   newTag: prod-ec00688
