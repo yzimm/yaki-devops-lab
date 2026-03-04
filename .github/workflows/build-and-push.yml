@@ -1,5 +1,4 @@
-﻿@'
-name: CI - Build, Push & Deploy
+﻿$yaml = "name: CI - Build, Push & Deploy
 on:
   push:
     branches:
@@ -19,9 +18,8 @@ jobs:
 
       - name: Install kustomize
         run: |
-          KUSTOMIZE_VERSION="5.4.1"
-          curl -L -o kustomize.tar.gz \
-            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
+          KUSTOMIZE_VERSION=`"5.4.1`"
+          curl -L -o kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.4.1/kustomize_v5.4.1_linux_amd64.tar.gz
           tar -xzf kustomize.tar.gz
           chmod +x kustomize
           sudo mv kustomize /usr/local/bin/
@@ -30,19 +28,19 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: `${{ secrets.DOCKER_USERNAME }}
+          password: `${{ secrets.DOCKER_PASSWORD }}
 
       - name: Set Docker image tag
         id: vars
         run: |
-          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-          if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "TAG=prod-${SHORT_SHA}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref_name }}" = "staging" ]; then
-            echo "TAG=staging-${SHORT_SHA}" >> $GITHUB_OUTPUT
+          SHORT_SHA=`$(echo `$GITHUB_SHA | cut -c1-7)
+          if [ `"`${{ github.ref_name }}`" = `"main`" ]; then
+            echo `"TAG=prod-`${SHORT_SHA}`" >> `$GITHUB_OUTPUT
+          elif [ `"`${{ github.ref_name }}`" = `"staging`" ]; then
+            echo `"TAG=staging-`${SHORT_SHA}`" >> `$GITHUB_OUTPUT
           else
-            echo "TAG=dev-${SHORT_SHA}" >> $GITHUB_OUTPUT
+            echo `"TAG=dev-`${SHORT_SHA}`" >> `$GITHUB_OUTPUT
           fi
 
       - name: Build and push Docker image
@@ -50,29 +48,21 @@ jobs:
         with:
           context: ./app
           push: true
-          tags: yaki2026/my-web-app:${{ steps.vars.outputs.TAG }}
+          tags: yaki2026/my-web-app:`${{ steps.vars.outputs.TAG }}
 
       - name: Update image in kustomization
         run: |
-          ENV_FOLDER=$(echo "${{ steps.vars.outputs.TAG }}" | cut -d'-' -f1)
-          cd k8s/overlays/$ENV_FOLDER
-          kustomize edit set image my-web-app=yaki2026/my-web-app:${{ steps.vars.outputs.TAG }}
+          ENV_FOLDER=`$(echo `"`${{ steps.vars.outputs.TAG }}`" | cut -d'-' -f1)
+          cd k8s/overlays/`$ENV_FOLDER
+          kustomize edit set image my-web-app=yaki2026/my-web-app:`${{ steps.vars.outputs.TAG }}
 
       - name: Commit and push kustomization
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          ENV_FOLDER=$(echo "${{ steps.vars.outputs.TAG }}" | cut -d'-' -f1)
-          git add k8s/overlays/$ENV_FOLDER/kustomization.yaml
-          git diff --cached --quiet || git commit -m "Update image to ${{ steps.vars.outputs.TAG }}"
-          git push
+          git config user.name `"github-actions`"
+          git config user.email `"github-actions@github.com`"
+          ENV_FOLDER=`$(echo `"`${{ steps.vars.outputs.TAG }}`" | cut -d'-' -f1)
+          git add k8s/overlays/`$ENV_FOLDER/kustomization.yaml
+          git diff --cached --quiet || git commit -m `"Update image to `${{ steps.vars.outputs.TAG }}`"
+          git push"
 
-      - name: Deploy to cluster
-        if: ${{ secrets.KUBECONFIG != '' }}
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
-        run: |
-          ENV_FOLDER=$(echo "${{ steps.vars.outputs.TAG }}" | cut -d'-' -f1)
-          cd k8s/overlays/$ENV_FOLDER
-          kubectl apply -k .
-'@ | Set-Content .\.github\workflows\build-and-push.yml -Encoding UTF8
+[System.IO.File]::WriteAllText("$PWD\.github\workflows\build-and-push.yml", $yaml, [System.Text.UTF8Encoding]::new($false))
