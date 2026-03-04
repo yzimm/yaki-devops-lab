@@ -1,7 +1,9 @@
 resources:
-  - ../../base
+- ../../base
 
 images:
-  - name: my-web-app
-    newName: yaki2026/my-web-app
-    newTag: dev
+- name: my-web-app
+  newName: yaki2026/my-web-app
+  newTag: dev
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
